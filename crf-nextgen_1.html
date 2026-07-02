@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRF | Every Cure Begins as an Unfunded Idea</title>
+<meta name="description" content="The Cancer Research Foundation funds the first spark: seed capital for early-career cancer scientists. Est. 1947.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080d;
+  --bg-2:#0c0e16;
+  --white:#f2f2f5;
+  --dim:rgba(242,242,245,.55);
+  --violet:#7c5cff;
+  --magenta:#ff4ecd;
+  --cyan:#4ee7ff;
+  --grad:linear-gradient(100deg,#7c5cff 0%,#ff4ecd 55%,#ff8a5c 100%);
+  --display:'Syne',sans-serif;
+  --body:'Manrope',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--body);line-height:1.6;overflow-x:hidden}
+::selection{background:var(--magenta);color:#000}
+a{color:inherit}
+.wrap{max-width:1280px;margin:0 auto;padding:0 5vw}
+.mono{font-family:var(--mono);font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
+.grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* grain */
+body::after{content:"";position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:999;opacity:.05;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+animation:grain 8s steps(10) infinite}
+@keyframes grain{0%,100%{transform:translate(0,0)}10%{transform:translate(-5%,-8%)}30%{transform:translate(3%,-15%)}50%{transform:translate(-10%,7%)}70%{transform:translate(7%,12%)}90%{transform:translate(-4%,3%)}}
+
+/* ---------- Preloader ---------- */
+#loader{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;transition:transform .9s cubic-bezier(.83,0,.17,1)}
+#loader.done{transform:translateY(-100%)}
+#loader .mono{color:var(--white)}
+#loadNum{font-family:var(--display);font-weight:800;font-size:clamp(4rem,14vw,9rem);line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ---------- Cursor ---------- */
+#cursor,#cursorRing{position:fixed;top:0;left:0;pointer-events:none;z-index:998;border-radius:50%;transform:translate(-50%,-50%)}
+#cursor{width:8px;height:8px;background:var(--white);mix-blend-mode:difference}
+#cursorRing{width:38px;height:38px;border:1px solid rgba(242,242,245,.5);transition:width .25s,height .25s,border-color .25s;mix-blend-mode:difference}
+#cursorRing.big{width:74px;height:74px;border-color:var(--white)}
+@media (pointer:fine){body,a,button{cursor:none}}
+@media (pointer:coarse){#cursor,#cursorRing{display:none}}
+
+/* ---------- Canvas ---------- */
+#field{position:fixed;inset:0;z-index:0}
+
+/* ---------- Nav ---------- */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;mix-blend-mode:difference}
+.nav-inner{display:flex;justify-content:space-between;align-items:center;padding:26px 5vw}
+.logo{font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:.06em;text-decoration:none}
+.logo span{color:var(--magenta)}
+.nav-right{display:flex;gap:34px;align-items:center}
+.nav-right a{font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;opacity:.75;transition:opacity .2s}
+.nav-right a:hover{opacity:1}
+
+/* ---------- Sections ---------- */
+main{position:relative;z-index:1}
+section{position:relative}
+
+/* Hero */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 5vw 60px}
+.hero .mono{margin-bottom:3vh;display:flex;align-items:center;gap:14px}
+.hero .mono::before{content:"";width:40px;height:1px;background:var(--magenta)}
+h1{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(2.9rem,10.5vw,9.5rem);line-height:.94;letter-spacing:-.02em}
+h1 .line{display:block;overflow:hidden}
+h1 .line span{display:block;transform:translateY(110%);animation:rise 1s cubic-bezier(.16,1,.3,1) forwards}
+h1 .line:nth-child(2) span{animation-delay:.12s}
+h1 .line:nth-child(3) span{animation-delay:.24s}
+@keyframes rise{to{transform:translateY(0)}}
+.hero-foot{margin-top:6vh;display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap}
+.hero-foot p{max-width:44ch;color:var(--dim);font-size:1.02rem}
+.scroll-cue{font-family:var(--mono);font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:12px}
+.scroll-cue::after{content:"";width:1px;height:44px;background:linear-gradient(var(--white),transparent);animation:drip 1.8s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* Marquee */
+.marquee{border-top:1px solid rgba(242,242,245,.12);border-bottom:1px solid rgba(242,242,245,.12);overflow:hidden;padding:16px 0;background:rgba(7,8,13,.6);backdrop-filter:blur(6px)}
+.marquee-track{display:flex;gap:0;width:max-content;animation:scrollx 26s linear infinite}
+.marquee-track span{font-family:var(--display);font-weight:700;font-size:1rem;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;padding:0 34px;color:var(--dim)}
+.marquee-track span b{color:var(--white)}
+.marquee-track span i{font-style:normal;color:var(--magenta);padding-left:34px}
+@keyframes scrollx{to{transform:translateX(-50%)}}
+
+/* Story panels */
+.panel{min-height:100vh;display:flex;align-items:center;padding:0 5vw}
+.panel-inner{max-width:1280px;margin:0 auto;width:100%}
+.panel .mono{display:block;margin-bottom:22px;color:var(--magenta)}
+.panel h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(2.2rem,7vw,6.2rem);line-height:.98;letter-spacing:-.015em;max-width:16ch}
+.panel p{margin-top:28px;max-width:52ch;color:var(--dim);font-size:1.08rem}
+.panel h2 .strike{position:relative;white-space:nowrap}
+.panel h2 .strike::after{content:"";position:absolute;left:-2%;right:-2%;top:52%;height:.08em;background:var(--magenta);transform:scaleX(0);transform-origin:left;transition:transform .8s cubic-bezier(.16,1,.3,1) .3s}
+.panel.in h2 .strike::after{transform:scaleX(1)}
+
+/* Stats */
+.stats{padding:16vh 5vw;background:linear-gradient(180deg,transparent,rgba(12,14,22,.92) 18%,rgba(12,14,22,.92) 82%,transparent)}
+.stats-grid{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
+.stat-cell{padding:44px 30px;border-left:1px solid rgba(242,242,245,.14);position:relative}
+.stat-cell b{display:block;font-family:var(--display);font-weight:800;font-size:clamp(2.6rem,5.5vw,4.8rem);line-height:1;letter-spacing:-.02em}
+.stat-cell:nth-child(odd) b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat-cell span{display:block;margin-top:14px;font-size:.9rem;color:var(--dim);max-width:22ch}
+.stat-cell .mono{position:absolute;top:16px;right:20px;font-size:.6rem}
+
+/* Programs */
+.programs{padding:16vh 5vw}
+.programs-head{max-width:1280px;margin:0 auto 8vh}
+.programs-head h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(2rem,5.5vw,4.6rem);line-height:1;letter-spacing:-.015em}
+.prog-list{max-width:1280px;margin:0 auto;border-top:1px solid rgba(242,242,245,.16)}
+.prog-row{display:grid;grid-template-columns:90px 1fr auto;gap:4vw;align-items:center;padding:46px 10px;border-bottom:1px solid rgba(242,242,245,.16);text-decoration:none;position:relative;transition:padding .35s cubic-bezier(.16,1,.3,1)}
+.prog-row:hover{padding-left:34px}
+.prog-row .idx{font-family:var(--mono);font-size:.75rem;color:var(--dim)}
+.prog-row h3{font-family:var(--display);font-weight:700;font-size:clamp(1.5rem,3.6vw,2.9rem);line-height:1.05;letter-spacing:-.01em;text-transform:uppercase;transition:color .3s}
+.prog-row:hover h3{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.prog-row small{display:block;font-family:var(--body);font-weight:400;font-size:.95rem;color:var(--dim);text-transform:none;letter-spacing:0;margin-top:10px;max-width:56ch}
+.prog-row .arrow{font-family:var(--display);font-size:2rem;font-weight:700;transition:transform .35s cubic-bezier(.16,1,.3,1)}
+.prog-row:hover .arrow{transform:translateX(12px) rotate(-45deg);color:var(--magenta)}
+.prog-row .glow{position:absolute;inset:0;background:radial-gradient(600px 140px at var(--mx,50%) 50%,rgba(124,92,255,.14),transparent 70%);opacity:0;transition:opacity .3s;pointer-events:none}
+.prog-row:hover .glow{opacity:1}
+
+/* Announcement banner */
+.banner{margin:6vh 5vw 0;max-width:1280px;margin-left:auto;margin-right:auto}
+.banner-inner{position:relative;border-radius:22px;padding:8vh 6vw;overflow:hidden;background:
+  radial-gradient(900px 420px at 12% 0%,rgba(124,92,255,.4),transparent 60%),
+  radial-gradient(800px 420px at 92% 110%,rgba(255,78,205,.35),transparent 60%),
+  #10121c;border:1px solid rgba(242,242,245,.14)}
+.banner-inner .mono{color:var(--cyan)}
+.banner-inner h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(1.9rem,4.6vw,3.9rem);line-height:1.02;letter-spacing:-.015em;margin-top:18px;max-width:22ch}
+.banner-inner p{margin-top:20px;max-width:52ch;color:var(--dim)}
+.btn{display:inline-block;margin-top:34px;font-family:var(--mono);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;text-decoration:none;padding:1.3em 2.6em;border-radius:999px;position:relative;color:#000;background:var(--white);font-weight:500;transition:transform .25s,box-shadow .25s}
+.btn:hover{transform:translateY(-3px);box-shadow:0 0 0 1px rgba(242,242,245,.3),0 14px 40px rgba(255,78,205,.35)}
+.btn-grad{background:var(--grad);color:#000}
+
+/* Donate */
+.donate{padding:18vh 5vw}
+.donate-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1.1fr .9fr;gap:6vw;align-items:center}
+.donate h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(2.4rem,7vw,6rem);line-height:.96;letter-spacing:-.02em}
+.donate p{margin-top:24px;color:var(--dim);max-width:46ch;font-size:1.05rem}
+.donate-card{border:1px solid rgba(242,242,245,.16);border-radius:22px;padding:44px 40px;background:rgba(12,14,22,.75);backdrop-filter:blur(10px)}
+.chip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.chip{font-family:var(--display);font-weight:700;font-size:1.05rem;padding:18px 0;border-radius:14px;border:1px solid rgba(242,242,245,.2);background:transparent;color:var(--white);cursor:none;transition:all .2s}
+@media (pointer:coarse){.chip{cursor:pointer}}
+.chip:hover{border-color:var(--violet)}
+.chip.on{background:var(--grad);color:#000;border-color:transparent;box-shadow:0 10px 34px rgba(255,78,205,.35)}
+.impact{margin:24px 0 8px;min-height:56px;font-size:.95rem;color:var(--dim)}
+.impact b{color:var(--white)}
+.donate-card .btn{width:100%;text-align:center;margin-top:14px}
+.fine{margin-top:16px;font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);text-align:center}
+
+/* Footer */
+footer{position:relative;z-index:1;border-top:1px solid rgba(242,242,245,.12);padding:70px 5vw 40px;background:var(--bg)}
+.foot-grid{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:50px}
+.foot-grid h4{font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-bottom:18px}
+.foot-grid p,.foot-grid li{font-size:.9rem;color:var(--dim)}
+.foot-grid ul{list-style:none}
+.foot-grid li{padding:4px 0}
+.foot-grid a{text-decoration:none;transition:color .2s}
+.foot-grid a:hover{color:var(--white)}
+.foot-big{max-width:1280px;margin:60px auto 0;overflow:hidden}
+.foot-big span{display:block;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(3rem,11vw,10rem);line-height:.9;letter-spacing:-.02em;color:rgba(242,242,245,.06);white-space:nowrap}
+.foot-note{max-width:1280px;margin:34px auto 0;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(242,242,245,.35)}
+
+/* Reveal */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .9s ease,transform .9s cubic-bezier(.16,1,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+@media (max-width:940px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .donate-inner{grid-template-columns:1fr;gap:50px}
+  .prog-row{grid-template-columns:50px 1fr;gap:20px}
+  .prog-row .arrow{display:none}
+  .foot-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  .stats-grid{grid-template-columns:1fr}
+  .nav-right a:not(.nav-give){display:none}
+  .foot-grid{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  #field,#loader,body::after{display:none!important}
+  *{animation:none!important;transition:none!important}
+  h1 .line span{transform:none}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div id="loader"><div id="loadNum">0</div><span class="mono">Cancer Research Foundation</span></div>
+<div id="cursor"></div><div id="cursorRing"></div>
+<canvas id="field" aria-hidden="true"></canvas>
+
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="#" data-hover>CRF<span>.</span></a>
+    <div class="nav-right">
+      <a href="#story" data-hover>Mission</a>
+      <a href="#programs" data-hover>Programs</a>
+      <a href="#news" data-hover>News</a>
+      <a href="#donate" class="nav-give" data-hover>Donate ↗</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <section class="hero">
+    <span class="mono">Est. 1947 &middot; Chicago &middot; Venture philanthropy in cancer science</span>
+    <h1>
+      <span class="line"><span>Every cure</span></span>
+      <span class="line"><span>begins as an</span></span>
+      <span class="line"><span><span class="grad-text">unfunded idea.</span></span></span>
+    </h1>
+    <div class="hero-foot">
+      <p>For 70+ years, CRF has backed rising-star cancer scientists at the exact moment no one else will: the beginning. Seed capital in. Breakthroughs out.</p>
+      <span class="scroll-cue">Scroll</span>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span><b>180+</b> researchers funded <i>●</i></span>
+      <span>backing bold ideas since <b>1947</b> <i>●</i></span>
+      <span><b>100%</b> of YIA proceeds to research <i>●</i></span>
+      <span>the future of cancer treatment starts here <i>●</i></span>
+      <span><b>180+</b> researchers funded <i>●</i></span>
+      <span>backing bold ideas since <b>1947</b> <i>●</i></span>
+      <span><b>100%</b> of YIA proceeds to research <i>●</i></span>
+      <span>the future of cancer treatment starts here <i>●</i></span>
+    </div>
+  </div>
+
+  <section class="panel reveal" id="story">
+    <div class="panel-inner">
+      <span class="mono">01 / The problem</span>
+      <h2>No data, <span class="strike">no grants.</span><br>No grants, no data.</h2>
+      <p>Major funders require primary data before they invest. Early-career scientists can't produce that data without investment. The boldest ideas in cancer research die here, in the gap, unread and untested.</p>
+    </div>
+  </section>
+
+  <section class="panel reveal">
+    <div class="panel-inner">
+      <span class="mono">02 / The move</span>
+      <h2>We fund the <span class="grad-text">first spark.</span></h2>
+      <p>CRF operates like a venture firm for science. We place seed capital with rising stars at the point of maximum risk and maximum leverage, so a hypothesis can become primary data, and primary data can become a career of discovery.</p>
+    </div>
+  </section>
+
+  <section class="panel reveal">
+    <div class="panel-inner">
+      <span class="mono">03 / The result</span>
+      <h2>180+ scientists across the gap.</h2>
+      <p>Researchers whose earliest work we backed have gone on to reshape how cancer is understood, detected, and treated. Their discoveries compound. So does your gift.</p>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stats-grid">
+      <div class="stat-cell reveal"><span class="mono">/01</span><b data-count="79" data-suffix="">0</b><span>years funding cancer research, since 1947</span></div>
+      <div class="stat-cell reveal"><span class="mono">/02</span><b data-count="180" data-suffix="+">0</b><span>researchers given their first seed capital</span></div>
+      <div class="stat-cell reveal"><span class="mono">/03</span><b data-count="100" data-suffix="%">0</b><span>of Young Investigator proceeds go directly to research</span></div>
+      <div class="stat-cell reveal"><span class="mono">/04</span><b>$100K</b><span>per Fletcher Scholars award, since 1989</span></div>
+    </div>
+  </section>
+
+  <section class="programs" id="programs">
+    <div class="programs-head reveal">
+      <span class="mono" style="color:var(--magenta)">The portfolio</span>
+      <h2>Three ways we<br>place our bets.</h2>
+    </div>
+    <div class="prog-list">
+      <a class="prog-row reveal" href="#" data-hover>
+        <span class="glow"></span>
+        <span class="idx">P/01</span>
+        <h3>Young Investigator Awards<small>First seed capital for early-career scientists as principal investigators. Nearly 30 years of breaking the catch-22.</small></h3>
+        <span class="arrow">→</span>
+      </a>
+      <a class="prog-row reveal" href="#" data-hover>
+        <span class="glow"></span>
+        <span class="idx">P/02</span>
+        <h3>Fletcher Scholars<small>$100,000 awards for established researchers pursuing novel, high-risk hypotheses. Endowed since 1989.</small></h3>
+        <span class="arrow">→</span>
+      </a>
+      <a class="prog-row reveal" href="#" data-hover>
+        <span class="glow"></span>
+        <span class="idx">P/03</span>
+        <h3>Goldblatt Fund<small>Directed capital for promising new directions in cancer science, rooted in the foundation's Chicago origins.</small></h3>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="banner reveal" id="news">
+    <div class="banner-inner">
+      <span class="mono">Announcement / 2026</span>
+      <h2>Meet the 2026 Young Investigators.</h2>
+      <p>A new class of scientists gets its start. Each one arrives with a hypothesis nobody has funded and leaves with the capital to prove it.</p>
+      <a class="btn" href="#" data-hover>Read the announcement</a>
+    </div>
+  </section>
+
+  <section class="donate" id="donate">
+    <div class="donate-inner">
+      <div class="reveal">
+        <span class="mono" style="color:var(--magenta)">Invest in discovery</span>
+        <h2 style="margin-top:16px">Be the <span class="grad-text">first money in.</span></h2>
+        <p>Every breakthrough on record was once an unfunded idea. Your gift becomes reagents, imaging time, and the first experiments behind the next one.</p>
+      </div>
+      <div class="donate-card reveal">
+        <div class="chip-grid" role="group" aria-label="Gift amount">
+          <button class="chip" data-hover data-impact="<b>$50</b> covers a day of lab consumables.">$50</button>
+          <button class="chip on" data-hover data-impact="<b>$100</b> funds reagents for a pilot experiment.">$100</button>
+          <button class="chip" data-hover data-impact="<b>$250</b> supports a week of dedicated research time.">$250</button>
+          <button class="chip" data-hover data-impact="<b>$500</b> underwrites core imaging and sequencing.">$500</button>
+          <button class="chip" data-hover data-impact="<b>$1,000</b> is a meaningful share of a seed grant.">$1,000</button>
+          <button class="chip" data-hover data-impact="Every gift, at every level, funds discovery.">Other</button>
+        </div>
+        <p class="impact" id="impact" aria-live="polite"><b>$100</b> funds reagents for a pilot experiment.</p>
+        <a class="btn btn-grad" id="giveBtn" href="#" data-hover>Give $100</a>
+        <p class="fine">Registered 501(c)(3) &middot; Gifts tax-deductible as allowed by law</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <h4>Cancer Research Foundation</h4>
+      <p>6200 N. Hiawatha Ave., Suite 640<br>Chicago, IL 60646<br><br>P 312.630.0055 &middot; F 312.630.0075</p>
+    </div>
+    <div>
+      <h4>Index</h4>
+      <ul>
+        <li><a href="#story" data-hover>Mission</a></li>
+        <li><a href="#programs" data-hover>Programs</a></li>
+        <li><a href="#news" data-hover>News</a></li>
+        <li><a href="#donate" data-hover>Donate</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Elsewhere</h4>
+      <ul>
+        <li><a href="#" data-hover>LinkedIn</a></li>
+        <li><a href="#" data-hover>Instagram</a></li>
+        <li><a href="#" data-hover>Facebook</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-big" aria-hidden="true"><span>Fund the future</span></div>
+  <div class="foot-note">
+    <span>501(c)(3) &middot; CRFCC EIN 81-2771469 &middot; CRF EIN 36-2385213</span>
+    <span>Design concept demo. Not an official CRF property.</span>
+  </div>
+</footer>
+
+<script>
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Preloader ---------- */
+(function(){
+  const loader=document.getElementById('loader'),num=document.getElementById('loadNum');
+  if(reduced){loader.remove();return}
+  let v=0;
+  const iv=setInterval(()=>{
+    v=Math.min(100,v+Math.ceil(Math.random()*14));
+    num.textContent=v;
+    if(v>=100){clearInterval(iv);setTimeout(()=>loader.classList.add('done'),250);setTimeout(()=>loader.remove(),1300)}
+  },70);
+})();
+
+/* ---------- Custom cursor ---------- */
+(function(){
+  if(matchMedia('(pointer:coarse)').matches||reduced)return;
+  const dot=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+  let mx=innerWidth/2,my=innerHeight/2,rx=mx,ry=my;
+  addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+  (function loop(){rx+=(mx-rx)*.16;ry+=(my-ry)*.16;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop)})();
+  document.querySelectorAll('[data-hover]').forEach(el=>{
+    el.addEventListener('mouseenter',()=>ring.classList.add('big'));
+    el.addEventListener('mouseleave',()=>ring.classList.remove('big'));
+  });
+})();
+
+/* ---------- Scroll-morphing particle field ----------
+   Sphere (a cell) → dividing cell → DNA double helix → dispersal ring
+---------------------------------------------------- */
+(function(){
+  if(reduced)return;
+  const cv=document.getElementById('field'),ctx=cv.getContext('2d');
+  let W,H,DPR=Math.min(devicePixelRatio,2);
+  const N=matchMedia('(max-width:700px)').matches?750:1600;
+  const targets=[];
+  function resize(){W=cv.width=innerWidth*DPR;H=cv.height=innerHeight*DPR;buildTargets()}
+  function buildTargets(){
+    targets.length=0;
+    const R=Math.min(W,H)*.34;
+    const sphere=[],divide=[],helix=[],ring=[];
+    for(let i=0;i<N;i++){
+      // fibonacci sphere
+      const k=i+.5,phi=Math.acos(1-2*k/N),theta=Math.PI*(1+Math.sqrt(5))*k;
+      sphere.push([R*Math.sin(phi)*Math.cos(theta),R*Math.sin(phi)*Math.sin(theta),R*Math.cos(phi)]);
+      // two separating cells
+      const r2=R*.68,side=i%2?1:-1;
+      divide.push([r2*Math.sin(phi)*Math.cos(theta)+side*R*.9,r2*Math.sin(phi)*Math.sin(theta),r2*Math.cos(phi)]);
+      // double helix
+      const t=(i/N)*Math.PI*6,strand=i%2?0:Math.PI,hr=R*.42;
+      helix.push([hr*Math.cos(t+strand),(i/N-.5)*R*2.6,hr*Math.sin(t+strand)]);
+      // dispersal ring
+      const a=(i/N)*Math.PI*2,rr=R*1.5+(i%7)*R*.03;
+      ring.push([rr*Math.cos(a),(Math.sin(i*7.3)*R*.12),rr*Math.sin(a)]);
+    }
+    targets.push(sphere,divide,helix,ring);
+  }
+  resize();addEventListener('resize',resize);
+
+  let mouseX=0,mouseY=0;
+  addEventListener('mousemove',e=>{mouseX=(e.clientX/innerWidth-.5);mouseY=(e.clientY/innerHeight-.5)});
+
+  let rotY=0,rotX=0;
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    // scroll progress across ~4 viewport heights of the story
+    const seg=Math.min(Math.max(scrollY/(innerHeight*1.15),0),3);
+    const a=Math.floor(Math.min(seg,2.999)),b=Math.min(a+1,3);
+    const f=seg-a,ease=f*f*(3-2*f);
+    rotY+=.0022+mouseX*.004;
+    rotX+= (mouseY*.5-rotX)*.03;
+    const cy=Math.cos(rotY),sy=Math.sin(rotY),cx=Math.cos(rotX),sx=Math.sin(rotX);
+    const F=900*DPR,CX=W*(innerWidth>940?.68:.5),CY=H*.5;
+    const A=targets[a],B=targets[b];
+    for(let i=0;i<N;i++){
+      let x=A[i][0]+(B[i][0]-A[i][0])*ease,
+          y=A[i][1]+(B[i][1]-A[i][1])*ease,
+          z=A[i][2]+(B[i][2]-A[i][2])*ease;
+      // rotate Y then X
+      let x1=x*cy-z*sy,z1=x*sy+z*cy;
+      let y1=y*cx-z1*sx,z2=y*sx+z1*cx;
+      const s=F/(F+z2);
+      const px=CX+x1*s,py=CY+y1*s;
+      const depth=(z2/(Math.min(W,H)*.34)+1)/2; // 0 near..1 far
+      const size=Math.max(.6,(2.4-depth*1.7))*DPR;
+      // color: violet near → magenta far
+      const r=Math.round(124+(255-124)*depth),
+            g=Math.round(92+(78-92)*depth),
+            bl=Math.round(255+(205-255)*depth);
+      ctx.fillStyle=`rgba(${r},${g},${bl},${.75-depth*.5})`;
+      ctx.fillRect(px,py,size,size);
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* ---------- Reveals ---------- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}
+}),{threshold:.18});
+document.querySelectorAll('.reveal,.panel').forEach(el=>io.observe(el));
+
+/* ---------- Count-up ---------- */
+const cio=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;cio.unobserve(e.target);
+  const t=+e.target.dataset.count,suf=e.target.dataset.suffix||'';
+  if(reduced){e.target.textContent=t+suf;return}
+  const d=1500,s=performance.now();
+  (function tick(n){const p=Math.min((n-s)/d,1),ez=1-Math.pow(1-p,3);
+    e.target.textContent=Math.round(t*ez)+(p===1?suf:'');
+    if(p<1)requestAnimationFrame(tick)})(s);
+}),{threshold:.5});
+document.querySelectorAll('[data-count]').forEach(el=>cio.observe(el));
+
+/* ---------- Program row glow follows cursor ---------- */
+document.querySelectorAll('.prog-row').forEach(row=>{
+  row.addEventListener('mousemove',e=>{
+    const r=row.getBoundingClientRect();
+    row.querySelector('.glow').style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
+  });
+});
+
+/* ---------- Donation chips ---------- */
+const impact=document.getElementById('impact'),giveBtn=document.getElementById('giveBtn');
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+  c.classList.add('on');
+  impact.innerHTML=c.dataset.impact;
+  giveBtn.textContent=c.textContent==='Other'?'Give today':'Give '+c.textContent;
+}));
+</script>
+</body>
+</html>
